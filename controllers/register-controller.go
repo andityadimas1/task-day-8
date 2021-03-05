@@ -18,6 +18,7 @@ import (
 				fmt.Println("Terjadi error")
 	}
 
+<<<<<<< HEAD
 	c.JSON(200, gin.H{
 		"message"  : "added",
 		"data": map[string]interface{}{
@@ -27,3 +28,14 @@ import (
 		},
 	})
 }
+=======
+		c.JSON(200, gin.H{
+			"message"  : "added",
+			"data": map[string]interface{}{
+				"email":     reg.Email,
+				"password":  reg.Password,
+				"nama" : reg.Nama,
+			},
+		})
+	}
+>>>>>>> a6d7f90ad675674de398e7f1cdb8fe9836e8ba0f
