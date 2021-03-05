@@ -6,9 +6,9 @@ import (
 )
 
 	type RegFunc struct {
-		email    string `json:"email"`
-		password string `json:"password"`
-		nama 	 string `json:"nama"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Nama 	 string `json:"nama"`
 	}
 	
 	func Register(c *gin.Context) {
@@ -21,9 +21,9 @@ import (
 		c.JSON(200, gin.H{
 			"message"  : "added",
 			"data": map[string]interface{}{
-				"email":     reg.email,
-				"password":  reg.password,
-				"nama" : reg.nama,
+				"email":     reg.Email,
+				"password":  reg.Password,
+				"nama" : reg.Nama,
 			},
 		})
 	}
