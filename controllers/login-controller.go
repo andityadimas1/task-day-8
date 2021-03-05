@@ -3,7 +3,7 @@ package controllers
 import (
 		"fmt"
 		"github.com/gin-gonic/gin"
-)
+	)
 
 
 	type LoginFunc struct {
@@ -20,6 +20,6 @@ import (
 
 		c.JSON(200, gin.H{
 			"status"   	  :  "success",
-			"access_token": "berhasil123",
+			"access_token":  "berhasil123",
 		})
 	}
