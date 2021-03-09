@@ -6,9 +6,8 @@ import (
 
 type Task struct {
 	gorm.Model
-
-	Id        uint   `json:"id"`
+	ID        uint   `json:"id"`
 	TaskNama  string `json:"tasknama"`
-	Completed bool `json:"completed"`
+	Completed string   `json:"completed"`
 	// Created   time.Time `json:"created at"` 
 }

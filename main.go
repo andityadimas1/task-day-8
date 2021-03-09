@@ -24,8 +24,10 @@ func main() {
 	request.POST("/register", strDB.RegisterUser)
 	request.POST("/login", strDB.LoginUser)
 	request.GET("/getuser", strDB.GetDataUser)
-	request.POST("/addtask", controllers.AddTask)
-	// request.PUT("/updatetask", controllers.Update)
+	request.POST("/addtask", strDB.AddTask)
+	request.PUT("/updatetask", strDB.UpdateTask)
+	request.PUT("/deletetetask", strDB.DeleteTask)
+	request.PUT("/gettask", strDB.GetTask)
 	log.Println("Server up and run on Port 8080")
 	request.Run()
 }
