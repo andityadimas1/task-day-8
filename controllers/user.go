@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,12 +11,28 @@ import (
 
 func (StrDB *StrDB) LoginUser(c *gin.Context) {
 	var (
-		// Id    models.User
 		result gin.H
 		user   models.User
 	)
-	if err := c.Bind(&user); err != nil {
-		fmt.Println("Tidak dapat login")
+
+	Email, _ := strconv.ParseInt(c.PostForm("email"), 10, 64)
+	Password, _ := strconv.ParseInt(c.PostForm("password"), 10, 64)
+	// user := c.PostForm(user)
+
+	// user.User = user
+	user.Email = string(Email)
+	user.Password = string(Password)
+
+	if res := StrDB.DB.Create(&user); res.Error != nil {
+		err := res.Error
+		result = gin.H{
+			"status":  "Bad Request",
+			"message": "Cant Process the Data!",
+			"errors":  err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, result)
+		logger.Sentry(err)
+
 	} else {
 		Email := c.PostForm("email")
 		Password := c.PostForm("password")
@@ -44,7 +59,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 	Name, _ := strconv.ParseInt(c.PostForm("Name"), 10, 64)
 	// user := c.PostForm(user)
 
-	user.Id = int(Id)
+	user.ID = uint(Id)
 	// user.User = user
 	user.Email = string(Email)
 	user.Name = string(Name)
@@ -58,7 +73,6 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 		}
 		c.JSON(http.StatusBadRequest, result)
 		logger.Sentry(err)
-
 	} else {
 		StrDB.DB.Create(&user)
 		result = gin.H{
@@ -93,7 +107,7 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 }
 
 type User struct {
-	Id          uint      `gorm:"primarykey, autoIncrement" json:"ID"`
+	ID          uint      `gorm:"primarykey, autoIncrement" json:"ID"`
 	Email       string    `json:"email"`
 	Password    string    `json:"passsword"`
 	Name        string    `json:"nama"`
