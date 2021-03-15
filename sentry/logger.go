@@ -1,4 +1,4 @@
-package sentryLogger
+package logger
 
 import (
 	"log"
@@ -10,6 +10,7 @@ import (
 )
 
 func Sentry(paramError error) {
+
 	var DsnSentry string
 
 	if err := godotenv.Load(".env"); err != nil {

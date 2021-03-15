@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 	"to-do-list/models"
+	logger "to-do-list/sentry"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,7 +43,7 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 		result = gin.H{
 			"status":  "success",
 			"message": "Sucessfully Login!",
-			"data":    user,
+			// "data":    user,
 		}
 	}
 
@@ -73,6 +74,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 		}
 		c.JSON(http.StatusBadRequest, result)
 		logger.Sentry(err)
+
 	} else {
 		StrDB.DB.Create(&user)
 		result = gin.H{
