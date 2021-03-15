@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	
-	"time"
 	"fmt"
-	"to-do-list/models"
 	"net/http"
+	"strconv"
+	"time"
+	"to-do-list/models"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,20 +14,20 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 	var (
 		// Id    models.User
 		result gin.H
-		user models.User
+		user   models.User
 	)
-	if  err := c.Bind(&user); err != nil{
+	if err := c.Bind(&user); err != nil {
 		fmt.Println("Tidak dapat login")
 	} else {
 		Email := c.PostForm("email")
 		Password := c.PostForm("password")
 
 		StrDB.DB.Where(&user, "email = ? AND password = ?", Email, Password)
-		
+
 		result = gin.H{
 			"status":  "success",
 			"message": "Sucessfully Login!",
-			"data" : user,
+			"data":    user,
 		}
 	}
 
@@ -36,10 +37,28 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 	var (
 		result gin.H
-		user models.User
+		user   User
 	)
-		if  err := c.Bind(&user); err != nil{
-		fmt.Println("Tidak dapat resgistrasi")
+	Id, _ := strconv.ParseInt(c.PostForm("ID"), 10, 64)
+	Email, _ := strconv.ParseInt(c.PostForm("email"), 10, 64)
+	Name, _ := strconv.ParseInt(c.PostForm("Name"), 10, 64)
+	// user := c.PostForm(user)
+
+	user.Id = int(Id)
+	// user.User = user
+	user.Email = string(Email)
+	user.Name = string(Name)
+
+	if res := StrDB.DB.Create(&user); res.Error != nil {
+		err := res.Error
+		result = gin.H{
+			"status":  "Bad Request",
+			"message": "Cant Process the Data!",
+			"errors":  err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, result)
+		logger.Sentry(err)
+
 	} else {
 		StrDB.DB.Create(&user)
 		result = gin.H{
@@ -49,38 +68,37 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 				"id":       user.ID,
 				"email":    user.Email,
 				"fullName": user.Name,
-				"data" : user,
+				"data":     user,
 			},
 		}
 	}
 	c.JSON(http.StatusOK, result)
 }
 
-func (StrDB *StrDB) GetDataUser(c *gin.Context){
-		var (
-			result gin.H
-			user models.User
+func (StrDB *StrDB) GetDataUser(c *gin.Context) {
+	var (
+		result gin.H
+		user   models.User
+	)
+	name := c.Param("name = ?")
 
-		)
-		name := c.Param("name = ?")
+	StrDB.DB.Find(&user, "name = ?", name)
 
-		StrDB.DB.Find(&user, "name = ?", name)
-		
-		result = gin.H{
-			"status":  "success",
-			"message": "Catch IT!",
-			// "data" : user,
-		}
-		c.JSON(http.StatusOK, result)		
-}
-type User struct{
-		Id string `json:"ID"`
-		Email string `json:"email"`
-		Password string `json:"passsword"`
-		Name string `json:"nama"`
-		CreatedDate time.Time `json:"id"`
+	result = gin.H{
+		"status":  "success",
+		"message": "Catch IT!",
+		"data":    user,
+	}
+	c.JSON(http.StatusOK, result)
 }
 
+type User struct {
+	Id          uint      `gorm:"primarykey, autoIncrement" json:"ID"`
+	Email       string    `json:"email"`
+	Password    string    `json:"passsword"`
+	Name        string    `json:"nama"`
+	CreatedDate time.Time `json:"id"`
+}
 
 // func (strDB *StrDB) Register(*gin.Context){
 // 	var (
@@ -88,4 +106,3 @@ type User struct{
 // 		Password models.User
 // 		User models.User
 // 	)
-	

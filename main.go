@@ -23,11 +23,12 @@ func main() {
 	//routes
 	request.POST("/register", strDB.RegisterUser)
 	request.POST("/login", strDB.LoginUser)
-	request.GET("/getuser", strDB.GetDataUser)
+	request.GET("/getuser/:ID", strDB.GetDataUser)
 	request.POST("/addtask", strDB.AddTask)
-	request.PUT("/updatetask", strDB.UpdateTask)
-	request.PUT("/deletetetask", strDB.DeleteTask)
-	request.PUT("/gettask", strDB.GetTask)
+	request.POST("/updatetask/:ID", strDB.UpdateTask)
+	request.DELETE("/deletetask/:ID", strDB.DeleteTask)
+	request.PUT("/gettask/:ID", strDB.GetTask)
+	// request.PUT("/listtask/", strDB.GetTask)
 	log.Println("Server up and run on Port 8080")
 	request.Run()
 }
