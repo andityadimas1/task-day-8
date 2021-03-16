@@ -9,5 +9,6 @@ type User struct {
 	ID       uint   `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Name 	 string `json:"fullName"`
+	Name     string `json:"fullName"`
+	Role     string `json:"role"`
 }
