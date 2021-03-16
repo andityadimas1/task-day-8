@@ -3,6 +3,7 @@ module to-do-list
 go 1.13
 
 require (
+	github.com/appleboy/gin-jwt v2.5.0+incompatible // indirect
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -17,6 +18,7 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/gorm v1.21.2

@@ -58,12 +58,15 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 	Id, _ := strconv.ParseInt(c.PostForm("ID"), 10, 64)
 	Email, _ := strconv.ParseInt(c.PostForm("email"), 10, 64)
 	Name, _ := strconv.ParseInt(c.PostForm("Name"), 10, 64)
+	Role, _ := strconv.ParseInt(c.PostForm("Role"), 10, 64)
+
 	// user := c.PostForm(user)
 
 	user.ID = uint(Id)
 	// user.User = user
 	user.Email = string(Email)
 	user.Name = string(Name)
+	user.Role = string(Role)
 
 	if res := StrDB.DB.Create(&user); res.Error != nil {
 		err := res.Error
@@ -84,6 +87,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 				"id":       user.ID,
 				"email":    user.Email,
 				"fullName": user.Name,
+				"role":     user.Role,
 				"data":     user,
 			},
 		}
@@ -113,6 +117,7 @@ type User struct {
 	Email       string    `json:"email"`
 	Password    string    `json:"passsword"`
 	Name        string    `json:"nama"`
+	Role        string    `json:"role"`
 	CreatedDate time.Time `json:"id"`
 }
 
