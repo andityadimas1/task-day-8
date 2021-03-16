@@ -41,10 +41,11 @@ func SeederUser(db *gorm.DB) {
 	var user User
 
 	for _, v := range userArray {
-		user.ID = 0
-		user.Role = v[1]
-		user.Password = v[2]
-		user.Email = v[3]
+		// user.ID = 0
+		user.Role = v[3]
+		user.Password = v[1]
+		user.Email = v[0]
+		user.Name = v[2]
 
 		// enkrip password
 		// param 1 dari password yang sudah ditentukan (contoh : admin)

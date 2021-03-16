@@ -25,9 +25,9 @@ func main() {
 
 	request.POST("/register", strDB.RegisterUser)
 
-	request.POST("/login", middleware.MiddleWare().LoginHandler)
+	request.POST("/login", controllers.MiddleWare().LoginHandler)
 
-	request.NoRoute(middleware.MiddleWare().MiddlewareFunc(), func(c *gin.Context) {
+	request.NoRoute(controllers.MiddleWare().MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
 		log.Printf("NoRoute claims: %#v\n", claims)
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
@@ -35,7 +35,7 @@ func main() {
 
 	auth := request.Group("/auth")
 
-	auth.Use(middleware.MiddleWare().MiddlewareFunc())
+	auth.Use(controllers.MiddleWare().MiddlewareFunc())
 	{
 		auth.POST("/addtask", strDB.AddTask)
 		auth.POST("/updatetask/:ID", strDB.UpdateTask)
