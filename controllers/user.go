@@ -55,61 +55,64 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 		result gin.H
 		user   User
 	)
-	Id, _ := strconv.ParseInt(c.PostForm("ID"), 10, 64)
-	Email, _ := strconv.ParseInt(c.PostForm("email"), 10, 64)
-	Name, _ := strconv.ParseInt(c.PostForm("Name"), 10, 64)
-	Role, _ := strconv.ParseInt(c.PostForm("Role"), 10, 64)
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+	if email == "" || password == "" {
+		err := "not filled!"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  "bad request",
+			"message": err,
+		})
+		if res := StrDB.DB.Create(&user); res.Error != nil {
+			err := res.Error
+			result = gin.H{
+				"status":  "Bad Request",
+				"message": "Cant Process the Data!",
+				"errors":  err.Error(),
+			}
+			c.JSON(http.StatusBadRequest, result)
+			logger.Sentry(err)
 
-	// user := c.PostForm(user)
-
-	user.ID = uint(Id)
-	// user.User = user
-	user.Email = string(Email)
-	user.Name = string(Name)
-	user.Role = string(Role)
-
-	if res := StrDB.DB.Create(&user); res.Error != nil {
-		err := res.Error
-		result = gin.H{
-			"status":  "Bad Request",
-			"message": "Cant Process the Data!",
-			"errors":  err.Error(),
+		} else {
+			StrDB.DB.Create(&user)
+			result = gin.H{
+				"status":  "success",
+				"message": "Registered!",
+				"data": map[string]interface{}{
+					"id":       user.ID,
+					"email":    user.Email,
+					"fullName": user.Name,
+					"role":     user.Role,
+					"data":     user,
+				},
+			}
 		}
-		c.JSON(http.StatusBadRequest, result)
-		logger.Sentry(err)
-
-	} else {
-		StrDB.DB.Create(&user)
-		result = gin.H{
-			"status":  "success",
-			"message": "Registered!",
-			"data": map[string]interface{}{
-				"id":       user.ID,
-				"email":    user.Email,
-				"fullName": user.Name,
-				"role":     user.Role,
-				"data":     user,
-			},
-		}
+		c.JSON(http.StatusOK, result)
 	}
-	c.JSON(http.StatusOK, result)
 }
 
 func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 	var (
+		user   []models.User
 		result gin.H
-		user   models.User
 	)
-	name := c.Param("name = ?")
+	Email := c.Param("email")
 
-	StrDB.DB.Find(&user, "name = ?", name)
-
-	result = gin.H{
-		"status":  "success",
-		"message": "Catch IT!",
-		"data":    user,
+	if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
+		err := res.Error
+		result = gin.H{
+			"status": "Not Found",
+			"errors": err.Error(),
+		}
+		c.JSON(http.StatusNotFound, result)
+		logger.Sentry(err)
+	} else {
+		result = gin.H{
+			"status": "success",
+			"data":   user,
+		}
+		c.JSON(http.StatusOK, result)
 	}
-	c.JSON(http.StatusOK, result)
 }
 
 type User struct {
@@ -120,10 +123,3 @@ type User struct {
 	Role        string    `json:"role"`
 	CreatedDate time.Time `json:"id"`
 }
-
-// func (strDB *StrDB) Register(*gin.Context){
-// 	var (
-// 		Email  models.User
-// 		Password models.User
-// 		User models.User
-// 	)
