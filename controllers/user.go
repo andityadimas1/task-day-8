@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 	"to-do-list/models"
 	logger "to-do-list/sentry"
@@ -16,8 +15,8 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 		user   models.User
 	)
 
-	Email, _ := strconv.ParseInt(c.PostForm("email"), 10, 64)
-	Password, _ := strconv.ParseInt(c.PostForm("password"), 10, 64)
+	Email := c.PostForm("email")
+	Password := c.PostForm("password")
 	// user := c.PostForm(user)
 
 	// user.User = user
