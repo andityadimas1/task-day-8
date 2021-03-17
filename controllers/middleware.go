@@ -63,11 +63,11 @@ func (StrDB *StrDB) MiddleWare() (mw *jwt.GinJWTMiddleware) { // the jwt middlew
 
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			method := c.Request.Method
-			if v, ok := data.(*User); ok && v.Role == "admin" {
+			if v, ok := data.(*user); ok && v.Role == "admin" {
 				return true
 			}
 
-			if v, ok := data.(*User); ok && v.Role == "guest" {
+			if v, ok := data.(*user); ok && v.Role == "guest" {
 				if method != "GET" {
 					return false
 				}

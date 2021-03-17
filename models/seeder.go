@@ -15,6 +15,8 @@ func SeederAddtask(db *gorm.DB) {
 		{"Pergi ke sekolah", "true"},
 		{"Napping", "false"},
 		{"main kelereng", "false"},
+		{"Nonton netflix", "false"},
+		{"main dota", "true"},
 	}
 
 	var task Task
@@ -23,7 +25,7 @@ func SeederAddtask(db *gorm.DB) {
 		// Get Data from Array
 		task.ID = 0
 		task.TaskNama = data[0]
-		task.Completed = data[0]
+		task.Completed = data[1]
 		db.Create(&task)
 	}
 	fmt.Println("seed!")
@@ -36,6 +38,8 @@ func SeederUser(db *gorm.DB) {
 		{"dimasdimas@gmail.com", "dimdim1234", "dimas", "guest"},
 		{"dimaslikescoffee@gmail.com", "dimas likes coffee", "dimas", "guest"},
 		{"dimasalwayslikescoffee@gmail.com", "dimas always likes coffee", "dimaskok", "guest"},
+		{"dimaslike@gmail.com", "dimas coffee", "dimas ya", "guest"},
+		{"dimastataga@gmail.com", "dimas tatagca", "asaas", "guest"},
 	}
 
 	var user User

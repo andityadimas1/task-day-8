@@ -1,0 +1,6 @@
+#### Dimas
+- Model : kurang 1 -> list task
+- Seeder masing2 model kurang 2 data
+- Check ulang seeder task
+- Check ulang model user
+- (optional) jwt authorizator

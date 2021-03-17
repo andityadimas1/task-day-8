@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
-	"time"
 	"to-do-list/models"
 	logger "to-do-list/sentry"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (StrDB *StrDB) LoginUser(c *gin.Context) {
@@ -52,16 +54,20 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 	var (
 		result gin.H
-		user   User
+		user   models.User
 	)
-	email := c.PostForm("email")
-	password := c.PostForm("password")
-	if email == "" || password == "" {
-		err := "not filled!"
-		c.JSON(http.StatusBadRequest, gin.H{
+	if err := c.Bind(&user); err != nil || user.Email == "" || user.Password == "" || user.Name == "" || user.Role == "" {
+		e := "Field Email, Password, FullName, Role is required!"
+		result = gin.H{
 			"status":  "bad request",
-			"message": err,
-		})
+			"message": e,
+		}
+		fmt.Println("Field Email, Password, FullName, Role is required!")
+		c.JSON(http.StatusBadRequest, result)
+
+		logger.Sentry(err) // push log error ke sentry
+
+	} else {
 		if res := StrDB.DB.Create(&user); res.Error != nil {
 			err := res.Error
 			result = gin.H{
@@ -70,15 +76,23 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 				"errors":  err.Error(),
 			}
 			c.JSON(http.StatusBadRequest, result)
+
 			logger.Sentry(err)
 
 		} else {
+			encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+			if err != nil {
+				log.Println(err)
+			}
+
+			user.Password = string(encrypt)
 			StrDB.DB.Create(&user)
 			result = gin.H{
 				"status":  "success",
 				"message": "Registered!",
 				"data": map[string]interface{}{
-					"id":       user.ID,
+					// "id":       user.ID,
 					"email":    user.Email,
 					"fullName": user.Name,
 					"role":     user.Role,
@@ -112,13 +126,4 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, result)
 	}
-}
-
-type User struct {
-	ID          uint      `gorm:"primarykey, autoIncrement" json:"ID"`
-	Email       string    `json:"email"`
-	Password    string    `json:"passsword"`
-	Name        string    `json:"nama"`
-	Role        string    `json:"role"`
-	CreatedDate time.Time `json:"id"`
 }

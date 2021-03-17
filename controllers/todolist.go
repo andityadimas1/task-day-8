@@ -14,32 +14,50 @@ func (StrDB *StrDB) AddTask(c *gin.Context) {
 		task   models.Task
 		result gin.H
 	)
-	tasknama := c.PostForm("tasknama")
-	completed := c.PostForm("completed")
+	// tasknama := c.PostForm("tasknama")
+	// completed := c.PostForm("completed")
 
-	task.TaskNama = tasknama
-	task.Completed = completed
+	// task.TaskNama = tasknama
+	// task.Completed = completed
 
-	if res := StrDB.DB.Create(&task); res.Error != nil {
-		err := res.Error
-		c.JSON(http.StatusBadRequest, gin.H{
+	if err := c.Bind(&task); err != nil || task.TaskNama == "" || task.Completed == "" {
+		e := "ADA YANG BELUM DIISI!"
+		result = gin.H{
 			"status":  "bad request",
-			"message": err.Error(),
-		})
-		logger.Sentry(err)
+			"message": e,
+		}
+		fmt.Println("Field ada yang belum diisi")
+		c.JSON(http.StatusBadRequest, result)
+
+		logger.Sentry(err) // push log error ke sentry
 
 	} else {
-		result = gin.H{
-			"status":  "success",
-			"message": "Sucessfully Added!",
-			"data": map[string]interface{}{
-				"ID":        task.ID,
-				"tasknama":  task.TaskNama,
-				"completed": task.Completed,
-			},
+
+		if res := StrDB.DB.Create(&task); res.Error != nil {
+			err := res.Error
+			result = gin.H{
+				"status":  "Bad Request",
+				"message": "Cant Process the Data!",
+				"errors":  err.Error(),
+			}
+			c.JSON(http.StatusBadRequest, result)
+
+			logger.Sentry(err)
+		} else {
+			StrDB.DB.Create(&task)
+			result = gin.H{
+				"status":  "success",
+				"message": "Sucessfully Added!",
+				"data": map[string]interface{}{
+					// "ID":        task.ID,
+					"tasknama":  task.TaskNama,
+					"completed": task.Completed,
+					"data":      task,
+				},
+			}
 		}
+		c.JSON(http.StatusOK, result)
 	}
-	c.JSON(http.StatusOK, result)
 }
 
 func (StrDB *StrDB) UpdateTask(c *gin.Context) {
@@ -135,9 +153,4 @@ func (StrDB *StrDB) GetTask(c *gin.Context) {
 	// 	c.JSON(http.StatusOK, result)
 	//  }
 
-	type Task struct {
-		ID        string `gorm:"primarykey" json:"id"`
-		Tasknama  string `json:"tasknama"`
-		Completed string `json:"completed"`
-	}
 }
