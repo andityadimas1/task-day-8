@@ -16,14 +16,14 @@ func SeederAddtask(db *gorm.DB) {
 		{"Napping", "false"},
 		{"main kelereng", "false"},
 		{"Nonton netflix", "false"},
-		{"main dota", "true"},
+		{"main dota2 sampai pagi", "true"},
 	}
 
 	var task Task
 
 	for _, data := range AddtaskArray {
 		// Get Data from Array
-		task.ID = 0
+		// task.ID = 0
 		task.TaskNama = data[0]
 		task.Completed = data[1]
 		db.Create(&task)

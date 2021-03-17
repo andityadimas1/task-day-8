@@ -9,6 +9,28 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func SentryString(message string) {
+
+	var DsnSentry string
+
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf(err.Error())
+	} else { // tidak ada error saat ambil file .env
+		DsnSentry = os.Getenv("DSN_SENTRY") // isi value dari variable DsnSentry
+	}
+
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: DsnSentry,
+	})
+
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	defer sentry.Flush(2 * time.Second)
+
+	sentry.CaptureMessage(message)
+}
+
 func Sentry(paramError error) {
 
 	var DsnSentry string
