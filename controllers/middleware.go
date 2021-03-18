@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"time"
 	"to-do-list/models"
@@ -62,19 +63,24 @@ func (StrDB *StrDB) MiddleWare() (mw *jwt.GinJWTMiddleware) { // the jwt middlew
 		},
 
 		Authorizator: func(data interface{}, c *gin.Context) bool {
+			fmt.Println()
 			method := c.Request.Method
-			if v, ok := data.(*user); ok && v.Role == "admin" {
-				return true
-			}
+			claims := jwt.ExtractClaims(c)
 
-			if v, ok := data.(*user); ok && v.Role == "guest" {
+			var result bool
+			if claims["role"] == "admin" {
+				result = true
+			} else if claims["role"] == "guest" {
 				if method != "GET" {
-					return false
+					result = false
+				} else {
+					result = true
 				}
-				return true
+			} else {
+				result = false
 			}
-
-			return false
+			fmt.Println("Ini result nya", result)
+			return result
 		},
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*login); ok {

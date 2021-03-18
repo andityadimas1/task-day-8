@@ -42,7 +42,7 @@ func (StrDB *StrDB) AddTask(c *gin.Context) {
 			}
 			c.JSON(http.StatusBadRequest, result)
 
-			logger.Sentry(err)
+			logger.SentryString(err.Error())
 		} else {
 			StrDB.DB.Create(&task)
 			result = gin.H{
@@ -80,7 +80,7 @@ func (StrDB *StrDB) UpdateTask(c *gin.Context) {
 			"errors":  err.Error(),
 		}
 		c.JSON(http.StatusNotFound, result)
-		logger.Sentry(err)
+		logger.SentryString(err.Error())
 	} else {
 		task.TaskNama = tasknama
 		StrDB.DB.Save(&task)
@@ -117,7 +117,7 @@ func (StrDB *StrDB) GetTask(c *gin.Context) {
 			"errors":  err.Error(),
 		}
 		c.JSON(http.StatusNotFound, result)
-		logger.Sentry(err)
+		logger.SentryString(err.Error())
 	} else {
 		result = gin.H{
 			"status":  "success",
@@ -126,31 +126,29 @@ func (StrDB *StrDB) GetTask(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, result)
 	}
+}
 
-	// func (StrDB *StrDB) GetAllListTask(c *gin.Context) {
-	// 	var (
-	// 		task []models.Task
-	// 		result gin.H
-	// 	)
-	// 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "5"))
-	// 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-
-	// 	paginator := helpers.Paging (&helpers.Param{
-	// 		DB:      strDB.DB,
-	// 		Page:    page,
-	// 		Limit:   limit,
-	// 		OrderBy: []string{"id task"},
-	// 		ShowSQL: true,
-	// 		Join:    "",
-	// 		Query:   "",
-	// 	}
-	// StrDB.DB.Find(&task)
-	// result = gin.H{
-	// 	"status":  "success",
-	// 	"message": "Successfully Listed",
-	// 	"data":    task,
-	// }
-	// 	c.JSON(http.StatusOK, result)
-	//  }
-
+func (StrDB *StrDB) GetAllListTask(c *gin.Context) {
+	var (
+		task   []models.Task
+		result gin.H
+	)
+	TaskNama := c.Param("tasknama")
+	if res := StrDB.DB.Where("tasknama", TaskNama).First(&task); res.Error != nil {
+		err := res.Error
+		result = gin.H{
+			"status":  "not found",
+			"message": "cant find any data yet",
+			"errors":  err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, result)
+		logger.SentryString(err.Error())
+	} else {
+		result = gin.H{
+			"status":  "success",
+			"message": "Succesfully get data",
+			"data":    task,
+		}
+		c.JSON(http.StatusOK, result)
+	}
 }

@@ -33,7 +33,7 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 			"errors":  err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, result)
-		logger.Sentry(err)
+		logger.SentryString(err.Error())
 
 	} else {
 		Email := c.PostForm("email")
@@ -65,7 +65,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 		fmt.Println("Field Email, Password, FullName, Role is required!")
 		c.JSON(http.StatusBadRequest, result)
 
-		logger.Sentry(err) // push log error ke sentry
+		logger.SentryString(err.Error())
 
 	} else {
 		if res := StrDB.DB.Create(&user); res.Error != nil {
@@ -77,7 +77,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 			}
 			c.JSON(http.StatusBadRequest, result)
 
-			logger.Sentry(err)
+			logger.SentryString(err.Error())
 
 		} else {
 			encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -118,7 +118,7 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 			"errors": err.Error(),
 		}
 		c.JSON(http.StatusNotFound, result)
-		logger.Sentry(err)
+		logger.SentryString(err.Error())
 	} else {
 		result = gin.H{
 			"status": "success",
