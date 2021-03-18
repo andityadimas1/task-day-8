@@ -34,7 +34,7 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 			"errors":  err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, result)
-		logger.SentryString(err.Error())
+		logger.Sentry(err)
 
 	} else {
 		Email := c.PostForm("email")
@@ -66,49 +66,45 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 		fmt.Println("Field Email, Password, FullName, Role is required!")
 		c.JSON(http.StatusBadRequest, result)
 
-		logger.SentryString(err.Error())
+		logger.Sentry(err) // push log error ke sentry
 
 	} else {
 		if res := StrDB.DB.Create(&user); res.Error != nil {
-			if check, data := GetRedis(key); check != false {
-				if err := json.Unmarshal(data, &user); err != nil {
-					fmt.Println("Error", err.Error())
-				}
-				fmt.Println(user)
-				result = gin.H{
-					"status":  "Bad Request",
-					"message": "Cant Process the Data!",
-					"errors":  err.Error(),
-				}
-				c.JSON(http.StatusBadRequest, result)
-
-				logger.SentryString(err.Error())
-
-			} else {
-				encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-
-				if err != nil {
-					log.Println(err)
-				}
-
-				user.Password = string(encrypt)
-				StrDB.DB.Create(&user)
-				result = gin.H{
-					"status":  "success",
-					"message": "Registered!",
-					"data": map[string]interface{}{
-						// "id":       user.ID,
-						"email":    user.Email,
-						"fullName": user.Name,
-						"role":     user.Role,
-						"data":     user,
-					},
-				}
+			err := res.Error
+			result = gin.H{
+				"status":  "Bad Request",
+				"message": "Cant Process the Data!",
+				"errors":  err.Error(),
 			}
-			c.JSON(http.StatusOK, result)
+			c.JSON(http.StatusBadRequest, result)
+
+			logger.Sentry(err)
+
+		} else {
+			encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+			if err != nil {
+				log.Println(err)
+			}
+
+			user.Password = string(encrypt)
+			StrDB.DB.Create(&user)
+			result = gin.H{
+				"status":  "success",
+				"message": "Registered!",
+				"data": map[string]interface{}{
+					// "id":       user.ID,
+					"email":    user.Email,
+					"fullName": user.Name,
+					"role":     user.Role,
+					"data":     user,
+				},
+			}
 		}
+		c.JSON(http.StatusOK, result)
 	}
 }
+
 func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 	var (
 		user   []models.User
@@ -117,18 +113,23 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 	Email := c.Param("email")
 
 	if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
-		err := res.Error
-		result = gin.H{
-			"status": "Not Found",
-			"errors": err.Error(),
+		if check, data := GetRedis(); check != false {
+			if err := json.Unmarshal(data, &user); err != nil {
+				fmt.Println("Error", err.Error())
+			}
+			err := res.Error
+			result = gin.H{
+				"status": "Not Found",
+				"errors": err.Error(),
+			}
+			c.JSON(http.StatusNotFound, result)
+			logger.Sentry(err)
+		} else {
+			result = gin.H{
+				"status": "success",
+				"data":   user,
+			}
+			c.JSON(http.StatusOK, result)
 		}
-		c.JSON(http.StatusNotFound, result)
-		logger.SentryString(err.Error())
-	} else {
-		result = gin.H{
-			"status": "success",
-			"data":   user,
-		}
-		c.JSON(http.StatusOK, result)
 	}
 }
