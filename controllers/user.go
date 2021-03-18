@@ -111,25 +111,38 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 		result gin.H
 	)
 	Email := c.Param("email")
+	key := fmt.Sprintf("Email_%s", Email)
 
-	if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
-		if check, data := GetRedis(); check != false {
-			if err := json.Unmarshal(data, &user); err != nil {
-				fmt.Println("Error", err.Error())
-			}
+	// if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
+	if check, data := GetRedis(key); check != false {
+		if err := json.Unmarshal(data, &user); err != nil {
+			fmt.Println("Error", err.Error())
+		}
+		fmt.Print(user)
+		result = gin.H{
+
+			"status": "success",
+			"data":   user,
+		}
+		c.JSON(http.StatusNotFound, result)
+		logger.Sentry(err)
+	} else {
+		if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
 			err := res.Error
 			result = gin.H{
 				"status": "Not Found",
 				"errors": err.Error(),
 			}
-			c.JSON(http.StatusNotFound, result)
-			logger.Sentry(err)
+			c.JSON(http.StatusOK, result)
 		} else {
+			data, _ := json.Marshal(user)
 			result = gin.H{
-				"status": "success",
-				"data":   user,
+				"status":  "success",
+				"message": "data added",
+				"data":    user,
 			}
 			c.JSON(http.StatusOK, result)
+			SetRedis(key, string(data))
 		}
 	}
 }

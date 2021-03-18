@@ -41,6 +41,7 @@ func main() {
 		auth.POST("/updatetask/:ID", strDB.UpdateTask)
 		auth.DELETE("/deletetask/:ID", strDB.DeleteTask)
 		auth.PUT("/gettask/:ID", strDB.GetTask)
+		auth.PUT("/getuser", strDB.GetDataUser)
 	}
 
 	// request.POST("/register", strDB.RegisterUser)

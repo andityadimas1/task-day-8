@@ -17,7 +17,7 @@ func GetRedis(key string) (bool, []byte) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	getData, _ := redis.Bytes(conn.Do("GET"))
+	getData, _ := redis.Bytes(conn.Do("GET", key))
 	if getData != nil { // ketika ada datanya di redis
 		log.Println("Data Found!")
 		log.Println(string(getData))
@@ -26,7 +26,7 @@ func GetRedis(key string) (bool, []byte) {
 	return false, getData
 }
 
-func SetSRedis(key string, value string) {
+func SetRedis(key string, value string) {
 	newPool := redis.NewPool(func() (redis.Conn, error) {
 		return redis.Dial("tcp", "localhost:5678")
 	}, 10)
