@@ -6,7 +6,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-func GetRedis() {
+func GetRedis(key string) (bool, []byte) {
 	// bikin pool untuk connection ke redis
 	pool := redis.NewPool(func() (redis.Conn, error) {
 		return redis.Dial("tcp", "localhost:5678")

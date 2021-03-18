@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -69,41 +70,45 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 
 	} else {
 		if res := StrDB.DB.Create(&user); res.Error != nil {
-			err := res.Error
-			result = gin.H{
-				"status":  "Bad Request",
-				"message": "Cant Process the Data!",
-				"errors":  err.Error(),
+			if check, data := GetRedis(key); check != false {
+				if err := json.Unmarshal(data, &user); err != nil {
+					fmt.Println("Error", err.Error())
+				}
+				fmt.Println(user)
+				result = gin.H{
+					"status":  "Bad Request",
+					"message": "Cant Process the Data!",
+					"errors":  err.Error(),
+				}
+				c.JSON(http.StatusBadRequest, result)
+
+				logger.SentryString(err.Error())
+
+			} else {
+				encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+				if err != nil {
+					log.Println(err)
+				}
+
+				user.Password = string(encrypt)
+				StrDB.DB.Create(&user)
+				result = gin.H{
+					"status":  "success",
+					"message": "Registered!",
+					"data": map[string]interface{}{
+						// "id":       user.ID,
+						"email":    user.Email,
+						"fullName": user.Name,
+						"role":     user.Role,
+						"data":     user,
+					},
+				}
 			}
-			c.JSON(http.StatusBadRequest, result)
-
-			logger.SentryString(err.Error())
-
-		} else {
-			encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-
-			if err != nil {
-				log.Println(err)
-			}
-
-			user.Password = string(encrypt)
-			StrDB.DB.Create(&user)
-			result = gin.H{
-				"status":  "success",
-				"message": "Registered!",
-				"data": map[string]interface{}{
-					// "id":       user.ID,
-					"email":    user.Email,
-					"fullName": user.Name,
-					"role":     user.Role,
-					"data":     user,
-				},
-			}
+			c.JSON(http.StatusOK, result)
 		}
-		c.JSON(http.StatusOK, result)
 	}
 }
-
 func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 	var (
 		user   []models.User
