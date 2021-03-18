@@ -14,11 +14,9 @@ func GetRedis() {
 
 	pool.MaxActive = 10
 
-	// ambil 1 koneksi
 	conn := pool.Get()
 	defer conn.Close()
 
-	// coba untuk cache data dari data map
 	getData, _ := redis.Bytes(conn.Do("GET"))
 	if getData != nil { // ketika ada datanya di redis
 		log.Println("Data Found!")
@@ -28,16 +26,14 @@ func GetRedis() {
 	return false, getData
 }
 
-func SetRedis(key string, value string) {
-	pool := redis.NewPool(func() (redis.Conn, error) {
+func SetSRedis(key string, value string) {
+	newPool := redis.NewPool(func() (redis.Conn, error) {
 		return redis.Dial("tcp", "localhost:5678")
 	}, 10)
-	pool.MaxActive = 10
+	newPool.MaxActive = 10
 
-	// Get connection
-	conn := pool.Get()
+	conn := newPool.Get()
 	defer conn.Close()
 
-	// Finding Data with key
 	conn.Do("SETEX", key, 30, string(value))
 }
