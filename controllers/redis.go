@@ -10,9 +10,9 @@ func GetRedis(key string) (bool, []byte) {
 	// bikin pool untuk connection ke redis
 	pool := redis.NewPool(func() (redis.Conn, error) {
 		return redis.Dial("tcp", "localhost:5678")
-	}, 10)
+	}, 60)
 
-	pool.MaxActive = 10
+	pool.MaxActive = 60
 
 	conn := pool.Get()
 	defer conn.Close()
@@ -29,11 +29,11 @@ func GetRedis(key string) (bool, []byte) {
 func SetRedis(key string, value string) {
 	newPool := redis.NewPool(func() (redis.Conn, error) {
 		return redis.Dial("tcp", "localhost:5678")
-	}, 10)
-	newPool.MaxActive = 10
+	}, 60)
+	newPool.MaxActive = 60
 
 	conn := newPool.Get()
 	defer conn.Close()
 
-	conn.Do("SETEX", key, 30, string(value))
+	conn.Do("SETEX", key, 70, string(value))
 }

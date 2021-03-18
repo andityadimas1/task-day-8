@@ -117,15 +117,14 @@ func (StrDB *StrDB) GetDataUser(c *gin.Context) {
 	if check, data := GetRedis(key); check != false {
 		if err := json.Unmarshal(data, &user); err != nil {
 			fmt.Println("Error", err.Error())
+			logger.Sentry(err)
 		}
 		fmt.Print(user)
 		result = gin.H{
-
 			"status": "success",
 			"data":   user,
 		}
 		c.JSON(http.StatusNotFound, result)
-		logger.Sentry(err)
 	} else {
 		if res := StrDB.DB.Preload("email=", Email).Find(&user); res.Error != nil {
 			err := res.Error
