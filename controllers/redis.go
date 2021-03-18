@@ -19,7 +19,7 @@ func GetRedis() {
 	defer conn.Close()
 
 	// coba untuk cache data dari data map
-	getData, _ := redis.Bytes(conn.Do("GET", key))
+	getData, _ := redis.Bytes(conn.Do("GET"))
 	if getData != nil { // ketika ada datanya di redis
 		log.Println("Data Found!")
 		log.Println(string(getData))
@@ -28,16 +28,16 @@ func GetRedis() {
 	return false, getData
 }
 
-// 	// untuk ambil cache di redis
-// 	reply, _ := redis.Bytes(conn.Do("GET", "mahasiswa"))
-// 	if reply != nil { // ketika ada datanya di redis
-// 		log.Println("data dari redis ada, ini datanya")
-// 		log.Println(string(reply))
-// 	} else { // ketika ngga ada datanya di redis
-// 		log.Println("data dari redis ngga ada, coba ambil dari db")
-// 		output, _ := json.Marshal(user)
+func SetRedis(key string, value string) {
+	pool := redis.NewPool(func() (redis.Conn, error) {
+		return redis.Dial("tcp", "localhost:5678")
+	}, 10)
+	pool.MaxActive = 10
 
-// 		// untuk set cache di redis
-// 		conn.Do("SETEX", "mahasiswa", 20, string(output))
-// 	}
-// }
+	// Get connection
+	conn := pool.Get()
+	defer conn.Close()
+
+	// Finding Data with key
+	conn.Do("SETEX", key, 30, string(value))
+}
