@@ -49,6 +49,13 @@ func main() {
 	log.Println("Server up and run on Port 8080")
 	request.Run()
 }
+func cronJob() {
+	gocron.Every(30).Seconds().Do(Crownjob())
+	<-gocron.Start()
+ 	}()
+	request.Run(":1234")
+}
+
 func Crownjob() {
 	var (
 		mail []models.RegistEmail
