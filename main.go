@@ -9,8 +9,9 @@ import (
 	"to-do-list/controllers"
 	"to-do-list/models"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/jasonlvhit/gocron"
 )
 
 func main() {
@@ -48,11 +49,12 @@ func main() {
 	}
 	log.Println("Server up and run on Port 8080")
 	// request.Run()
-	}
-	func cronJob() {
+
+	go func() {
 		gocron.Every(30).Seconds().Do(Crownjob())
 		<-gocron.Start()
-		}
+	}()
+
 	request.Run(":8080")
 }
 

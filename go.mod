@@ -12,6 +12,7 @@ require (
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
+	github.com/jasonlvhit/gocron v0.0.1 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
