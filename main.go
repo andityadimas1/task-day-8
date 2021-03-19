@@ -47,13 +47,13 @@ func main() {
 		auth.GET("/getuser", strDB.GetDataUser)
 	}
 	log.Println("Server up and run on Port 8080")
-	request.Run()
-}
-func cronJob() {
-	gocron.Every(30).Seconds().Do(Crownjob())
-	<-gocron.Start()
- 	}()
-	request.Run(":1234")
+	// request.Run()
+	}
+	func cronJob() {
+		gocron.Every(30).Seconds().Do(Crownjob())
+		<-gocron.Start()
+		}
+	request.Run(":8080")
 }
 
 func Crownjob() {
