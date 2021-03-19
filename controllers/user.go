@@ -59,12 +59,12 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 	)
 
 	if err := c.Bind(&user); err != nil || user.Email == "" || user.Password == "" || user.Name == "" || user.Role == "" {
-		e := "Field Email, Password, FullName, Role is required!"
+		e := " theres a empty field!"
 		result = gin.H{
 			"status":  "bad request",
 			"message": e,
 		}
-		fmt.Println("Field Email, Password, FullName, Role is required!")
+		fmt.Println("theres a empty field")
 		c.JSON(http.StatusBadRequest, result)
 
 		logger.Sentry(err) // push log error ke sentry
@@ -98,6 +98,7 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 
 			StrDB.DB.Create(&email)
 			// StrDB.DB.Create(&user)
+
 			result = gin.H{
 				"status":  "success",
 				"message": "Registered!",
