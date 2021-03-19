@@ -25,11 +25,11 @@ func ConfigEmail(to []string, subject, message string) error {
 
 	err := godotenv.Load("env")
 	if err == nil {
-		body := "from" + os.Getenv("MAILER") + "\n" +
+		body := "from" + os.Getenv("MAILER_NAME") + "\n" +
 			"To: " + strings.Join(to, ",") + "\n" +
 			"Subject: " + subject + "\n\n" +
 			message
-		auth := smtp.PlainAuth("", os.Getenv("MAILER_EMAIL"), os.Getenv("MAILER_PASSWORD"), os.Getenv("MAILER_HOST"))
+		auth := smtp.PlainAuth("", os.Getenv("MAILER_NAME"), os.Getenv("MAILER_PASSWORD"), os.Getenv("MAILER_HOST"))
 		smtpAdd := os.Getenv("MAILER_HOST") + ":" + os.Getenv("MAILER_PORT")
 		err := smtp.SendMail(smtpAdd, auth, os.Getenv("MAILER_EMAIL"), to, []byte(body))
 

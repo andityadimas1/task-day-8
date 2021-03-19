@@ -51,7 +51,7 @@ func main() {
 	// request.Run()
 
 	go func() {
-		gocron.Every(30).Seconds().Do(Crownjob())
+		gocron.Every(30).Minutes().Do(Crownjob)
 		<-gocron.Start()
 	}()
 

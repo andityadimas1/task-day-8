@@ -21,7 +21,7 @@ func Migrations(db *gorm.DB) {
 		fmt.Println("Table berhasil tercreate")
 	}
 	if check := db.Migrator().HasTable(&RegistEmail{}); !check { // kalau belum ada di db postgre
-		db.Migrator().CreateTable(&ListData{})
+		db.Migrator().CreateTable(&RegistEmail{})
 		fmt.Println("Table berhasil tercreate")
 	}
 }
