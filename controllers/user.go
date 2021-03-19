@@ -3,13 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"to-do-list/models"
 	logger "to-do-list/sentry"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (StrDB *StrDB) LoginUser(c *gin.Context) {
@@ -53,10 +51,13 @@ func (StrDB *StrDB) LoginUser(c *gin.Context) {
 }
 
 func (StrDB *StrDB) RegisterUser(c *gin.Context) {
+
 	var (
+		email  models.RegistEmail
 		result gin.H
 		user   models.User
 	)
+
 	if err := c.Bind(&user); err != nil || user.Email == "" || user.Password == "" || user.Name == "" || user.Role == "" {
 		e := "Field Email, Password, FullName, Role is required!"
 		result = gin.H{
@@ -81,14 +82,22 @@ func (StrDB *StrDB) RegisterUser(c *gin.Context) {
 			logger.Sentry(err)
 
 		} else {
-			encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+			// encrypt, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
-			if err != nil {
-				log.Println(err)
-			}
+			// if err != nil {
+			// 	log.Println(err)
+			// }
 
-			user.Password = string(encrypt)
-			StrDB.DB.Create(&user)
+			// user.Password = string(encrypt)
+
+			mail := user.Email
+			email.Type = "send email"
+			email.Email = mail
+			email.Status = false
+			email.Message = fmt.Sprintf("Hello %s, your account registered!", user.Name)
+
+			StrDB.DB.Create(&email)
+			// StrDB.DB.Create(&user)
 			result = gin.H{
 				"status":  "success",
 				"message": "Registered!",

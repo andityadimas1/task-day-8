@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-redis/redis/v8 v8.7.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
+	"to-do-list/backgroundtask"
 	"to-do-list/config"
 	"to-do-list/controllers"
 	"to-do-list/models"
 
-	jwt "github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,17 +46,24 @@ func main() {
 		auth.PUT("/gettask/:ID", strDB.GetTask)
 		auth.GET("/getuser", strDB.GetDataUser)
 	}
-
-	// request.POST("/register", strDB.RegisterUser)
-	// request.POST("/login", strDB.LoginUser)
-
-	// request.GET("/getuser/:ID", strDB.GetDataUser)
-	// request.POST("/addtask", strDB.AddTask)
-	// request.POST("/updatetask/:ID", strDB.UpdateTask)
-	// request.DELETE("/deletetask/:ID", strDB.DeleteTask)
-	// request.PUT("/gettask/:ID", strDB.GetTask)
-	// request.PUT("/listtask/", strDB.GetTask)
-
 	log.Println("Server up and run on Port 8080")
 	request.Run()
+}
+func Crownjob() {
+	var (
+		mail []models.RegistEmail
+	)
+	dbPG := config.Connect()
+	strDB := controllers.StrDB{DB: dbPG}
+
+	strDB.DB.Where("status = ?", false).Find(&mail)
+
+	fmt.Println(len(mail))
+
+	for i := 0; i < len(mail); i++ {
+		backgroundtask.RegisterEmail(mail[i].Email, mail[i].Message)
+		mail[i].Status = true
+		mail[i].DeliveredAt = time.Now()
+		strDB.DB.Save(&mail[i])
+	}
 }
